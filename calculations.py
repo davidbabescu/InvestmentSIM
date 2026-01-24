@@ -55,6 +55,10 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
 
     #Simularea trecerii anilor:
     for an in range(ani, ani + 1):
+        #1. Adaugam contributiile din an
         contributie_anuala = contributie_lunara * 12
         sold_curent += contributie_anuala
         total_investit += contributie_anuala
+        #2. Aplicam dobanda compusa la suma acumulata
+        dobanda_generata += sold_curent * rata_dec
+        sold_curent += dobanda_generata

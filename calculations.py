@@ -59,6 +59,30 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
         contributie_anuala = contributie_lunara * 12
         sold_curent += contributie_anuala
         total_investit += contributie_anuala
+
         #2. Aplicam dobanda compusa la suma acumulata
         dobanda_generata += sold_curent * rata_dec
         sold_curent += dobanda_generata
+
+        #3. Scadem inflatia
+        #Formula : Valoare / (1 + inflatie)^numar_ani
+        factor_actualizare = (1 + inflatie_dec) ** an
+        sold_real = sold_curent / factor_actualizare
+
+        #4. Calcul taxe
+        profit_brut = sold_curent - total_investit
+        impozit = (profit_brut * rata_impozit / 100) if profit_brut > 0 else 0
+        profit_net = profit_brut - impozit
+
+        #Salvam datele anului curent
+        date_colectate.append ({
+            "An" : an,
+            "Scenariu" : nume_scenariu,
+            "Total investit" : round(total_investit, 2),
+            "Sold nominal": round(sold_curent, 2),
+            "Sold real (Ajustat inflatiei)" : round(sold_real, 2),
+            "Profit NET": round(profit_net, 2) #Primeste si statul 10%... !! Sa fim cinstiti daca tot.. :D
+        })
+
+    df - pd.DataFrame(date_colectate)
+    return df

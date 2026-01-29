@@ -51,7 +51,8 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
             "Total investit" : round(total_investit, 2),
             "Sold Nominal": round(sold_curent, 2),
             "Sold real (ajustat pentru inflatie)": round(sold_curent, 2),
-            "Profit NET": 0
+            "Profit NET": 0,
+            "ROI (%)": 0.0
         })
 
     #Simularea trecerii anilor:
@@ -74,7 +75,11 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
             profit_brut = sold_curent - total_investit
             impozit = (profit_brut * rata_impozit / 100) if profit_brut > 0 else 0
             profit_net = profit_brut - impozit
-
+            #Calcul ROI
+            if total_investit > 0:
+                roi_procent (profit_net / total_investit) * 100
+            else:
+                roi_procent = 0
             #Salvam datele anului curent
             date_colectate.append ({
                 "An" : an,
@@ -83,6 +88,7 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
                 "Sold Nominal": round(sold_curent, 2),
                 "Sold Real (Ajustat inflatiei)" : round(sold_real, 2),
                 "Profit NET": round(profit_net, 2) #Primeste si statul 10%... !! Sa fim cinstiti daca tot.. :D
+                "ROI(%)": round(roi_procent, 2)
             })
 
     df = pd.DataFrame(date_colectate)

@@ -77,7 +77,7 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
             profit_net = profit_brut - impozit
             #Calcul ROI
             if total_investit > 0:
-                roi_procent (profit_net / total_investit) * 100
+                roi_procent = (profit_net / total_investit) * 100
             else:
                 roi_procent = 0
             #Salvam datele anului curent
@@ -87,7 +87,7 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
                 "Total Investit" : round(total_investit, 2),
                 "Sold Nominal": round(sold_curent, 2),
                 "Sold Real (Ajustat inflatiei)" : round(sold_real, 2),
-                "Profit NET": round(profit_net, 2) #Primeste si statul 10%... !! Sa fim cinstiti daca tot.. :D
+                "Profit NET": round(profit_net, 2), #Primeste si statul 10%... !! Sa fim cinstiti daca tot.. :D
                 "ROI(%)": round(roi_procent, 2)
             })
 

@@ -59,7 +59,7 @@ def main():
         # 3. Afisare Tabel Scurt (primele si ultimele randuri)
         print("\n--- REZULTATE SUMARE (Tabel) ---")
         # Afisam doar coloanele importante
-        cols = ["An", "Scenariu", "Sold Nominal", "Profit NET"]
+        cols = ["An", "Scenariu", "Sold Nominal", "Profit NET", "ROI(%)"]
         print(df_rezultate[cols].head(3))  # Primii 3 ani
         print("...")
         print(df_rezultate[cols].tail(3))  # Ultimii 3 ani

@@ -58,7 +58,7 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
             "Rata Anuala (%)": 0.0 #Vedem cat a fost dobanda in anul respectiv
         })
 
-    #Simularea anilor ce trec pe langa noi:
+    #Simularea anilor ce trec pe langa noi
         for an in range(1, ani + 1):
             #1. Adaugam contributiile din an
             contributie_anuala = contributie_lunara * 12

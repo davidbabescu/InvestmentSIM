@@ -9,6 +9,7 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
     1.Realist: Rata dobanzii introdusa de utilizator
     2. Optimist: Rata dobanzii + 3%
     3. Pesimist: Rata dobaznii - 3%
+    4. Volatil(Rata variaza in mod realist)
     Args:
     suma_initiala (float): Banii de start.
         contributie_lunara (float): Banii adaugati lunar.
@@ -34,12 +35,8 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
     for nume_scenariu, marja in scenarii.items():
         # Calculam rata specifica scenariului
         # Daca rata e 7% si marja e -3% (Pesimist), rata finala e 4%
-        rata_calculata_procent = rata_dobanzii + marja
 
-        if rata_calculata_procent < 0:
-            rata_calculata_procent = 0
 
-        rata_dec = rata_calculata_procent / 100
         inflatie_dec = rata_inflatie / 100
 
         #variabile pentru bucla:
@@ -50,12 +47,12 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
         date_colectate.append({
             "An" : 0,
             "Scenariu" : nume_scenariu,
-            "Total investit" : round(total_investit, 2),
+            "Total Investit" : round(total_investit, 2),
             "Sold Nominal": round(sold_curent, 2),
-            "Sold real (ajustat pentru inflatie)": round(sold_curent, 2),
+            "Sold real (Ajustat inflatiei)": round(sold_curent, 2),
             "Profit NET": 0,
             "ROI (%)": 0.0,
-            "Rata Anuala (%)": 0.0 #Vedem cat a fost dobanda in anul respectiv
+            "Rata Anuala (%)": 0.0
         })
 
     #Simularea anilor ce trec pe langa noi
@@ -71,13 +68,16 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
                 #Media = rata_dobanzii, Deviatia standard = 15% (Volatilitate mare)
                 rata_anuala_simulata = np.random.normal(rata_dobanzii, 15)
                 #Punem limita sa nu se piarda toti banii (Ex max: -40%)
-                if rata_anuala_simulata < -40: rata_anuala_simulata = -40
-
+                if rata_anuala_simulata < -40:
+                    rata_anuala_simulata = -40
                 rata_calculata_procent = rata_anuala_simulata
             else:
                 #Scenarii fixe
                 rata_calculata_procent = rata_dobanzii + marja
-                if rata_calculata_procent < 0: rata_calculata_procent = 0
+                if rata_calculata_procent < 0:
+                    rata_calculata_procent = 0
+
+            rata_dec = rata_calculata_procent / 100
 
             #2. Aplicam dobanda compusa la suma acumulata
             dobanda_generata = sold_curent * rata_dec

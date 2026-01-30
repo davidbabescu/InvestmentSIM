@@ -15,6 +15,5 @@
 3. In terminal: streamlit run app.py
 
 - **Docker**
-1. docker build -t investment-sim 
-2. docker run -p 8501:8501 investment-sim .
-3. In browser la adresa: http://localhost:8501
+1. In Docker Desktop, rulati in terminal: 
+- docker run -p 8501:8501 daveyx37/investment-sim:v1

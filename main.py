@@ -1,37 +1,35 @@
 import pandas as pd
 import sys
-
 from calculations import calculeaza_dobanda_compusa
 
-def deseneaza_grafic_ascii(df, scenariu="Realist"):
-    """
-    Deseneaza un grafic simplu folosind caractere text (*)
-    Afisieaza doar scenariul specificat
-    """
+
+def deseneaza_grafic_ascii(df, scenariu):
     print(f"\n--- GRAFIC EVOLUTIE (Scenariu: {scenariu}) ---")
     print("Fiecare '*' reprezinta aprox. 5% din valoarea maxima.\n")
 
-    df_filtrat = df [df["Scenariu"] == scenariu]
+    df_filtrat = df[df["Scenariu"] == scenariu]
 
     if df_filtrat.empty:
-        print("Eroare: scenariul nu a fost gasit")
+        print(f"Eroare: Scenariul '{scenariu}' nu a fost gasit.")
         return
 
-    # Aflam valoarea maxima pentru a scala graficul (sa incapa pe ecran)
     maxim_sold = df_filtrat["Sold Nominal"].max()
 
     for index, row in df_filtrat.iterrows():
         an = int(row["An"])
         suma = row["Sold Nominal"]
+        rata = row["Rata Anuala (%)"]
 
-        # Matematica pentru desenare:
-        # Daca suma e maxima, afisam 50 de stelute.
-        # Daca e jumatate, 25 de stelute.
-        lungime_bara = int((suma / maxim_sold) * 50)
+        # Desenam bara
+        if maxim_sold > 0:
+            lungime_bara = int((suma / maxim_sold) * 50)
+        else:
+            lungime_bara = 0
         bara = "*" * lungime_bara
 
-        # Afisam: Anul | Stelute | Suma in cifre
-        print(f"An {an:2d} | {bara} ({suma:,.0f} RON)")
+        # Afisam si rata din anul respectiv (ca sa vedem volatilitatea)
+        print(f"An {an:2d} | {bara} ({suma:,.0f} RON) [Randament: {rata:>5.1f}%]")
+
 
 def main():
     print("==============================================")
@@ -39,44 +37,41 @@ def main():
     print("==============================================\n")
 
     try:
-        # 1. Colectarea datelor de la tastatura
+        # Input-uri
         suma_init = float(input("1. Introdu suma initiala (RON): "))
         contributie = float(input("2. Contributie lunara (RON): "))
-        dobanda = float(input("3. Rata dobanzii anuale (%): "))
+        dobanda = float(input("3. Rata dobanzii anuale (Media, %): "))
         ani = int(input("4. Perioada investitiei (Ani): "))
         inflatie = float(input("5. Rata inflatiei estimata (%): "))
 
-        print("\n[INFO] Se efectueaza calculele...")
+        print("\n[INFO] Se genereaza scenariile (inclusiv cel VOLATIL)...")
 
-        # 2. Apelam functia din calculations.py
         df_rezultate = calculeaza_dobanda_compusa(
-            suma_init,
-            contributie,
-            dobanda,
-            ani,
-            inflatie
+            suma_init, contributie, dobanda, ani, inflatie
         )
-        # 3. Afisare Tabel Scurt (primele si ultimele randuri)
-        print("\n--- REZULTATE SUMARE (Tabel) ---")
-        # Afisam doar coloanele importante
-        cols = ["An", "Scenariu", "Sold Nominal", "Profit NET", "ROI(%)"]
-        print(df_rezultate[cols].head(3))  # Primii 3 ani
+
+        # Afisam rezultatele pentru scenariul VOLATIL (cel mai interesant)
+        scenariu_target = "Volatil (Piata Reala)"
+
+        print(f"\n--- REZULTATE PENTRU: {scenariu_target} ---")
+        cols = ["An", "Sold Nominal", "Profit NET", "ROI (%)", "Rata Anuala (%)"]
+
+        df_target = df_rezultate[df_rezultate["Scenariu"] == scenariu_target]
+        print(df_target[cols].head())
         print("...")
-        print(df_rezultate[cols].tail(3))  # Ultimii 3 ani
+        print(df_target[cols].tail())
 
-        # 4. Afisare Grafic Text (Doar pentru scenariul Realist)
-        deseneaza_grafic_ascii(df_rezultate, scenariu="Realist")
+        # Grafic text
+        deseneaza_grafic_ascii(df_rezultate, scenariu=scenariu_target)
 
-        # 5. Export CSV (Cerinta obligatorie)
-        nume_fisier = "rezultate_investitie.csv"
-        df_rezultate.to_csv(nume_fisier, index=False)
-        print(f"\n[SUCCES] Datele au fost salvate in fisierul '{nume_fisier}'.")
-        print("Poti deschide acest fisier in Excel.")
+        # Export
+        df_rezultate.to_csv("rezultate_investitie.csv", index=False)
+        print(f"\n[SUCCES] Fisier CSV generat.")
 
     except ValueError:
-        print("\n[EROARE] Te rog sa introduci doar numere valide (foloseste punctul '.' pentru zecimale).")
+        print("\n[EROARE] Introdu doar numere!")
     except Exception as e:
-        print(f"\n[EROARE] Ceva nu a mers bine: {e}")
+        print(f"\n[EROARE] {e}")
 
 
 if __name__ == "__main__":

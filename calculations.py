@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii, ani, rata_inflatie, rata_impozit=10):
 
@@ -23,7 +24,8 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
     scenarii = {
         "Realist": 0,
         "Optimist": 3.0, #+3%
-        "Pesimist": -3.0 #-3%
+        "Pesimist": -3.0, #-3%
+        "Volatil (Realist)": "RANDOM"
     }
 
     #lista unde colectam randurile tabelului
@@ -52,15 +54,30 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
             "Sold Nominal": round(sold_curent, 2),
             "Sold real (ajustat pentru inflatie)": round(sold_curent, 2),
             "Profit NET": 0,
-            "ROI (%)": 0.0
+            "ROI (%)": 0.0,
+            "Rata Anuala (%)": 0.0 #Vedem cat a fost dobanda in anul respectiv
         })
 
-    #Simularea trecerii anilor:
+    #Simularea anilor ce trec pe langa noi:
         for an in range(1, ani + 1):
             #1. Adaugam contributiile din an
             contributie_anuala = contributie_lunara * 12
             sold_curent += contributie_anuala
             total_investit += contributie_anuala
+
+            #LOGICA RATA VARIABILA
+            if marja == "RANDOM":
+                #Generam o rata aleatorie
+                #Media = rata_dobanzii, Deviatia standard = 15% (Volatilitate mare)
+                rata_anuala_simulata = np.random.normal(rata_dobanzii, 15)
+                #Punem limita sa nu se piarda toti banii (Ex max: -40%)
+                if rata_anuala_simulata < -40: rata_anuala_simulata = -40
+
+                rata_calculata_procent = rata_anuala_simulata
+            else:
+                #Scenarii fixe
+                rata_calculata_procent = rata_dobanzii + marja
+                if rata_calculata_procent < 0: rata_calculata_procent = 0
 
             #2. Aplicam dobanda compusa la suma acumulata
             dobanda_generata = sold_curent * rata_dec
@@ -75,11 +92,13 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
             profit_brut = sold_curent - total_investit
             impozit = (profit_brut * rata_impozit / 100) if profit_brut > 0 else 0
             profit_net = profit_brut - impozit
-            #Calcul ROI
+
+            #ROI
             if total_investit > 0:
                 roi_procent = (profit_net / total_investit) * 100
             else:
                 roi_procent = 0
+
             #Salvam datele anului curent
             date_colectate.append ({
                 "An" : an,
@@ -88,7 +107,8 @@ def calculeaza_dobanda_compusa(suma_initiala, contributie_lunara, rata_dobanzii,
                 "Sold Nominal": round(sold_curent, 2),
                 "Sold Real (Ajustat inflatiei)" : round(sold_real, 2),
                 "Profit NET": round(profit_net, 2), #Primeste si statul 10%... !! Sa fim cinstiti daca tot.. :D
-                "ROI(%)": round(roi_procent, 2)
+                "ROI (%)": round(roi_procent, 2),
+                "Rata Anuala (%)": round(rata_calculata_procent, 1)
             })
 
     df = pd.DataFrame(date_colectate)
